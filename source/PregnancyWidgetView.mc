@@ -1,3 +1,5 @@
+//Icon adapted from https://www.freevector.com/pregnancy-icon-set-21124
+
 using Toybox.WatchUi;
 using Toybox.Graphics;
 using Toybox.Lang;
@@ -59,23 +61,24 @@ var sizeTable = [
     [520, 3619], 
     [527, 3787], 
     ];
+    
+var heckWordTable = [
+	"Heck!",
+	"Baby!",
+	"Oh my!",
+	"Wowza!",
+	"Oooofff!",
+	"Uh-oh!",
+	"Incoming!",
+	]; 
 
 
 class PregnancyWidgetView extends WatchUi.View {
 
-	var estDueDate;
+	var shouldUpdate;
 
     function initialize() {
-        var options = {
-            :year   => 2021,
-            :month  => 4,
-            :day    => 23,
-            :hour   => 23
-        };
-
-        estDueDate = Gregorian.moment(options);
-
-
+        shouldUpdate = true;
         View.initialize();
     }
 
@@ -88,54 +91,91 @@ class PregnancyWidgetView extends WatchUi.View {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() {
+        shouldUpdate = true;
     }
 
     // Update the view
     function onUpdate(dc) {
-// Saturday Feb 24th, 2018 12:12am
+    	if(!shouldUpdate){
+    		return;
+        }
+        shouldUpdate = false;
+    	//things that should be settings:
+    	var dueYear = 2021;
+    	var dueMonth = 4;
+    	var dueDay = 22; 
+        var randomHeckWord = true; 
+        var printTimeToGo = false; //else, print time pregnant (since LMP)
+        var printMiscarriageRisk = true; //else, print probability of spontaneous labor (not yet implemented)
+    	
+        var options = {
+            :year   => dueYear,
+            :month  => dueMonth,
+            :day    => dueDay,
+            :hour   => 23
+        };
+
+        var estDueDate = Gregorian.moment(options);
         var info;
 
         info = Gregorian.info(estDueDate, Time.FORMAT_SHORT);
 
         var dueDateStr = Lang.format("$1$-$2$-$3$", [ info.year.format("%04u"), info.month.format("%02u"), info.day.format("%02u") ]);
 
-        var ttgString;
+        var infoString = "";
 
         var today = Time.today();
         
         if (today.greaterThan(estDueDate)){
-        	ttgString = "Overdue!";
+        	infoString += "Overdue!";
         } else {
             var timeToGo = estDueDate.subtract(Time.now());
             var timeToGoSec = timeToGo.value();
             var daysToGo = timeToGoSec / 86400;
-            var weeksToGo = daysToGo / 7;
-            ttgString  = "";
-            if (weeksToGo > 0){
-            	ttgString = ttgString + weeksToGo.format("%u")+"wk, ";
-            }
-            var fractionComplete = 100-(daysToGo*100)/(40*7);
-            ttgString = ttgString + (daysToGo - weeksToGo*7).format("%u")+"d ";
-            ttgString = ttgString + "(" + fractionComplete.format("%u") + "%)";
-            
-            var riskStr;
             var daysPregnant = (40*7-daysToGo);
-            if(daysPregnant>44){
-            	riskStr = "P[surv]>=98%";
-
-            } else if (daysPregnant <21){
-            // no risk data
-                riskStr = "";
-            } else {
-            	riskStr = "P[surv]="+(100-riskArray_21dOut[daysPregnant-21]).format("%.1f")+"%";
+            var fractionComplete = 100-(daysToGo*100)/(40*7);
+            
+            if(printTimeToGo){
+            	infoString += "TTG: ";
+                var weeksToGo = daysToGo / 7;
+                if (weeksToGo > 0){
+                    infoString += weeksToGo.format("%u")+"wk, ";
+                }
+                infoString +=  (daysToGo - weeksToGo*7).format("%u")+"d ";
+            }else{
+            	//print time elapsed
+            	var weeksPregnant = daysPregnant / 7;
+                if (weeksPregnant > 0){
+                    infoString += weeksPregnant.format("%u")+"wk, ";
+                }
+                infoString +=  (daysPregnant - weeksPregnant*7).format("%u")+"d ";
             }
-            ttgString = ttgString + "\n" + riskStr;
+            infoString += "(" + fractionComplete.format("%u") + "%)\n";
+
+			if(printMiscarriageRisk){
+                var riskStr;
+                if(daysPregnant>44){
+                    riskStr = "P[surv]>=98%";
+
+                } else if (daysPregnant <21){
+                // no risk data
+                    riskStr = "";
+                } else {
+                    riskStr = "P[surv]="+(100-riskArray_21dOut[daysPregnant-21]).format("%.1f")+"%";
+                }
+                infoString += riskStr;
+            }else{
+            	infoString += "P[labor in nxt 5d] = TODO";
+            }
+            infoString += "\n";
             
             //Size info:
             var wksPregnant = daysPregnant / 7;
             var sizeStr;
             if(wksPregnant>41){
             	sizeStr = "Overdue!";
+            } else if(wksPregnant<0){
+            	sizeStr = "Too early!";
             } else {
                 var c = (daysPregnant - wksPregnant*7)/7.0;
                 //interpolate wildly
@@ -144,18 +184,34 @@ class PregnancyWidgetView extends WatchUi.View {
                 l = Math.round(l);
                 m = Math.round(m);
 
-                sizeStr = l.format("%u")+"mm\n" + m.format("%u") + "g";
+				sizeStr = "";
+				if(l < 1){
+                    sizeStr += "<1mm\n" ;
+				} else {
+                    sizeStr += l.format("%u")+"mm\n" ;
+                }
+                if(m < 1){
+                    sizeStr += "<1g";
+                } else {
+                    sizeStr += m.format("%u") + "g";
+                }
             }
-            ttgString = ttgString + "\n" + sizeStr; 
+            infoString += sizeStr; 
         }
 
+        var dataString = "";
+        if(randomHeckWord){
+        	var ll = heckWordTable.size();
+        	var randInt = Time.now().value() % ll;
+            dataString += heckWordTable[randInt] + "\n";
+        }
+        dataString += "Due: " + dueDateStr;
+        dataString += "\n";
+        dataString += infoString;
         dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
         dc.clear();
         dc.setColor( Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT );
-        var string = "BABY!\nDue: " + dueDateStr;
-        string = string + "\n";
-        string = string + "TTG: " + ttgString;
-        dc.drawText( dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_TINY, string, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER );
+        dc.drawText( dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_TINY, dataString, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER );
     }
 
     // Called when this View is removed from the screen. Save the
