@@ -71,6 +71,14 @@ var heckWordTable = [
 	"Uh-oh!",
 	"Incoming!",
 	]; 
+	
+//day, CDF value (see python script)
+var cdfBornTable = [
+      [246.42487046632124, 0.0],
+      [267.6683937823834, 0.10108238090513785],
+      [280.62176165803106, 0.5174984949848987],
+      [298.2383419689119, 0.9999999966998467],
+	]; 
 
 
 class PregnancyWidgetView extends WatchUi.View {
@@ -93,6 +101,44 @@ class PregnancyWidgetView extends WatchUi.View {
     function onShow() {
         shouldUpdate = true;
     }
+    
+    function getHeckWord(){
+        var ll = heckWordTable.size();
+        var randInt = Time.now().value() % ll;
+        return heckWordTable[randInt];
+    }
+    
+    function getTimeToGoString(estDueDate, daysPregnant, daysToGo){
+        if(Time.today().greaterThan(estDueDate)){
+        	return "Overdue!";
+        }
+        var fractionComplete = (100*daysPregnant)/(40*7);
+
+        var outStr = "TTG: ";
+        var weeksToGo = daysToGo / 7;
+        if (weeksToGo > 0){
+            outStr += weeksToGo.format("%u")+"wk, ";
+        }
+        outStr +=  (daysToGo - weeksToGo*7).format("%u")+"d";
+
+        outStr += "(" + fractionComplete.format("%u") + "%)\n";
+        return outStr;
+    }
+
+    function getTimePregnantString(estDueDate, daysPregnant, daysToGo){
+    	var outStr = "";
+        var fractionComplete = (100*daysPregnant)/(40*7);
+        
+        //print time elapsed
+        var weeksPregnant = daysPregnant / 7;
+        if (weeksPregnant > 0){
+            outStr += weeksPregnant.format("%u")+"wk, ";
+        }
+        outStr +=  (daysPregnant - weeksPregnant*7).format("%u")+"d ";
+        outStr += "(" + fractionComplete.format("%u") + "%)\n";
+
+        return outStr;
+    }
 
     // Update the view
     function onUpdate(dc) {
@@ -106,13 +152,12 @@ class PregnancyWidgetView extends WatchUi.View {
     	var dueDay = 22; 
         var randomHeckWord = true; 
         var printTimeToGo = false; //else, print time pregnant (since LMP)
-        var printMiscarriageRisk = true; //else, print probability of spontaneous labor (not yet implemented)
+        var printMiscarriageRisk = false; 
     	
         var options = {
             :year   => dueYear,
             :month  => dueMonth,
             :day    => dueDay,
-            :hour   => 23
         };
 
         var estDueDate = Gregorian.moment(options);
@@ -126,84 +171,80 @@ class PregnancyWidgetView extends WatchUi.View {
 
         var today = Time.today();
         
-        if (today.greaterThan(estDueDate)){
-        	infoString += "Overdue!";
-        } else {
-            var timeToGo = estDueDate.subtract(Time.now());
-            var timeToGoSec = timeToGo.value();
-            var daysToGo = timeToGoSec / 86400;
-            var daysPregnant = (40*7-daysToGo);
-            var fractionComplete = 100-(daysToGo*100)/(40*7);
-            
-            if(printTimeToGo){
-            	infoString += "TTG: ";
-                var weeksToGo = daysToGo / 7;
-                if (weeksToGo > 0){
-                    infoString += weeksToGo.format("%u")+"wk, ";
-                }
-                infoString +=  (daysToGo - weeksToGo*7).format("%u")+"d ";
-            }else{
-            	//print time elapsed
-            	var weeksPregnant = daysPregnant / 7;
-                if (weeksPregnant > 0){
-                    infoString += weeksPregnant.format("%u")+"wk, ";
-                }
-                infoString +=  (daysPregnant - weeksPregnant*7).format("%u")+"d ";
-            }
-            infoString += "(" + fractionComplete.format("%u") + "%)\n";
+        //some useful numbers
+        var timeToGo = estDueDate.subtract(Time.now());
+        var timeToGoSec = timeToGo.value();
+        var daysToGo = timeToGoSec / 86400;
+        var daysPregnant = Time.today().value() - (estDueDate.value() - 40*7*24*60*60);
+        daysPregnant /= (24*60*60); //from sec to days
 
-			if(printMiscarriageRisk){
-                var riskStr;
-                if(daysPregnant>44){
-                    riskStr = "P[surv]>=98%";
-
-                } else if (daysPregnant <21){
-                // no risk data
-                    riskStr = "";
-                } else {
-                    riskStr = "P[surv]="+(100-riskArray_21dOut[daysPregnant-21]).format("%.1f")+"%";
-                }
-                infoString += riskStr;
-            }else{
-            	infoString += "P[labor in nxt 5d] = TODO";
-            }
-            infoString += "\n";
-            
-            //Size info:
-            var wksPregnant = daysPregnant / 7;
-            var sizeStr;
-            if(wksPregnant>41){
-            	sizeStr = "Overdue!";
-            } else if(wksPregnant<0){
-            	sizeStr = "Too early!";
-            } else {
-                var c = (daysPregnant - wksPregnant*7)/7.0;
-                //interpolate wildly
-                var l = sizeTable[wksPregnant][0] + (sizeTable[wksPregnant+1][0]-sizeTable[wksPregnant][0])*c;
-                var m = sizeTable[wksPregnant][1] + (sizeTable[wksPregnant+1][1]-sizeTable[wksPregnant][1])*c;
-                l = Math.round(l);
-                m = Math.round(m);
-
-				sizeStr = "";
-				if(l < 1){
-                    sizeStr += "<1mm\n" ;
-				} else {
-                    sizeStr += l.format("%u")+"mm\n" ;
-                }
-                if(m < 1){
-                    sizeStr += "<1g";
-                } else {
-                    sizeStr += m.format("%u") + "g";
-                }
-            }
-            infoString += sizeStr; 
+        if(printTimeToGo){
+            infoString += getTimeToGoString(estDueDate, daysPregnant, daysToGo);
+        }else{
+            infoString += getTimePregnantString(estDueDate, daysPregnant, daysToGo);
         }
+
+        if(printMiscarriageRisk){
+            var riskStr;
+
+            var riskDayIndex = daysPregnant - 21;
+            if(riskDayIndex >= riskArray_21dOut.size()){
+                riskStr = "P[surv]>=98%";
+            } else if (riskDayIndex < 0){
+            // no risk data
+                riskStr = "";
+            } else {
+                riskStr = "P[surv]="+(100-riskArray_21dOut[riskDayIndex]).format("%.1f")+"%";
+            }
+            infoString += riskStr;
+        }else{
+            //compute the approx. likelihood of spontaneous labor. 
+            infoString += "P[SL_1wk] ";
+            var cdf_val_in1Wk = cdf_born_by(daysPregnant+7);
+            var cdf_val_today = cdf_born_by(daysPregnant);
+            //bayes' rule
+            var r = (cdf_val_in1Wk-cdf_val_today)/(1-cdf_val_today);
+            r *= 100;
+            if(r < 0.01){
+                infoString += "< 0.01%";
+            }else{
+                infoString += "= "+r.format("%.1f")+"%";
+            } 
+        }
+        infoString += "\n";
+        
+        //Size info:
+        var wksPregnant = daysPregnant / 7;
+        var sizeStr;
+        if(wksPregnant>=41){
+            sizeStr = "Overdue!";
+        } else if(wksPregnant<0){
+            sizeStr = "Too early!";
+        } else {
+            var c = (daysPregnant - wksPregnant*7)/7.0;
+            //interpolate wildly
+            var l = sizeTable[wksPregnant][0] + (sizeTable[wksPregnant+1][0]-sizeTable[wksPregnant][0])*c;
+            var m = sizeTable[wksPregnant][1] + (sizeTable[wksPregnant+1][1]-sizeTable[wksPregnant][1])*c;
+            l = Math.round(l);
+            m = Math.round(m);
+
+            sizeStr = "";
+            if(l < 1){
+                sizeStr += "<1mm\n" ;
+            } else {
+                sizeStr += l.format("%u")+"mm\n" ;
+            }
+            if(m < 1){
+                sizeStr += "<1g";
+            } else {
+                sizeStr += m.format("%u") + "g";
+            }
+        }
+        infoString += sizeStr; 
 
         var dataString = "";
         if(randomHeckWord){
-        	var ll = heckWordTable.size();
-        	var randInt = Time.now().value() % ll;
-            dataString += heckWordTable[randInt] + "\n";
+        	dataString += getHeckWord() + "\n";
         }
         dataString += "Due: " + dueDateStr;
         dataString += "\n";
@@ -220,4 +261,29 @@ class PregnancyWidgetView extends WatchUi.View {
     function onHide() {
     }
 
+    function cdf_born_by(daysPreg) {
+    //using data from this paper, with my own hand-baked piecewise linear approximation
+    // The length of human pregnancy as calculated by ultrasonographic measurement of the fetal biparietal diameter
+    // Dr H. Kieler O. Axelsson S. Nilsson U. Waldenströ
+    	//read from our table, and interpolate wildly! 
+    	if(daysPreg < cdfBornTable[0][0]){
+            return 0.0;
+        }
+        //we'll need to look up --
+        var i = 1;
+        while(true){
+        	if(i >= cdfBornTable.size()){
+        		return 1;
+            }
+            if(cdfBornTable[i][0] > daysPreg){
+                break;
+            }
+            i += 1;
+        }
+        var x0 = cdfBornTable[i-1][0];
+        var x1 = cdfBornTable[i][0];
+        var y0 = cdfBornTable[i-1][1];
+        var y1 = cdfBornTable[i][1];
+        return y0 + (daysPreg-x0)/(x1-x0)*(y1-y0);
+    }
 }
