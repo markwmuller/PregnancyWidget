@@ -158,6 +158,9 @@ class PregnancyWidgetView extends WatchUi.View {
             :year   => dueYear,
             :month  => dueMonth,
             :day    => dueDay,
+            :hour   => 12,
+            :min    => 0,
+            :sec    => 0,
         };
 
         var estDueDate = Gregorian.moment(options);
@@ -169,8 +172,6 @@ class PregnancyWidgetView extends WatchUi.View {
 
         var infoString = "";
 
-        var today = Time.today();
-        
         //some useful numbers
         var timeToGo = estDueDate.subtract(Time.now());
         var timeToGoSec = timeToGo.value();
