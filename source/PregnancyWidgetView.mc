@@ -152,7 +152,7 @@ class PregnancyWidgetView extends WatchUi.View {
     	var dueDay = 22; 
         var randomHeckWord = true; 
         var printTimeToGo = false; //else, print time pregnant (since LMP)
-        var printMiscarriageRisk = false; 
+        var printMiscarriageRisk = true;  //else, probability of spontaneous labor
     	
         var options = {
             :year   => dueYear,
