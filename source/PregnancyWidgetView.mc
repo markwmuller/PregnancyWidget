@@ -139,6 +139,43 @@ class PregnancyWidgetView extends WatchUi.View {
 
         return outStr;
     }
+    
+    function getMiscarriageRiskString(daysPregnant){
+        var outStr;
+
+        var riskDayIndex = daysPregnant - 21;
+        if(riskDayIndex >= riskArray_21dOut.size()){
+            outStr = "P[surv]>=98%";
+        } else if (riskDayIndex < 0){
+        // no risk data
+            outStr = "";
+        } else {
+            outStr = "P[surv]="+(100-riskArray_21dOut[riskDayIndex]).format("%.1f")+"%";
+        }
+        return outStr;
+    }
+    
+    function getProbSpontaneousLabor(daysPregnant){
+        //compute the approx. likelihood of spontaneous labor. 
+        var outStr = "P[SL_1wk] ";
+        var cdf_val_in1Wk = cdf_born_by(daysPregnant+7);
+        var cdf_val_today = cdf_born_by(daysPregnant);
+        var r;
+        //bayes' rule
+        if(cdf_val_today >= 1){
+            //avoid divide by zero
+            r = 1;
+        } else {
+            r = (cdf_val_in1Wk-cdf_val_today)/(1-cdf_val_today);
+        }
+        r *= 100;
+        if(r < 0.01){
+            outStr += "< 0.01% *";
+        }else{
+            outStr += "= "+r.format("%.1f")+"%";
+        } 
+    }
+    
 
     // Update the view
     function onUpdate(dc) {
@@ -186,31 +223,9 @@ class PregnancyWidgetView extends WatchUi.View {
         }
 
         if(printMiscarriageRisk){
-            var riskStr;
-
-            var riskDayIndex = daysPregnant - 21;
-            if(riskDayIndex >= riskArray_21dOut.size()){
-                riskStr = "P[surv]>=98%";
-            } else if (riskDayIndex < 0){
-            // no risk data
-                riskStr = "";
-            } else {
-                riskStr = "P[surv]="+(100-riskArray_21dOut[riskDayIndex]).format("%.1f")+"%";
-            }
-            infoString += riskStr;
+        	infoString += getMiscarriageRiskString(daysPregnant);
         }else{
-            //compute the approx. likelihood of spontaneous labor. 
-            infoString += "P[SL_1wk] ";
-            var cdf_val_in1Wk = cdf_born_by(daysPregnant+7);
-            var cdf_val_today = cdf_born_by(daysPregnant);
-            //bayes' rule
-            var r = (cdf_val_in1Wk-cdf_val_today)/(1-cdf_val_today);
-            r *= 100;
-            if(r < 0.01){
-                infoString += "< 0.01%";
-            }else{
-                infoString += "= "+r.format("%.1f")+"%";
-            } 
+        	infoString += getProbSpontaneousLabor(daysPregnant);
         }
         infoString += "\n";
         
