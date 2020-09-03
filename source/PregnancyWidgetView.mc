@@ -108,11 +108,15 @@ class PregnancyWidgetView extends WatchUi.View {
         return heckWordTable[randInt];
     }
     
+    function getPercentageComplete(daysPregnant){
+        return (100*daysPregnant)/(40*7);
+    }
+    
     function getTimeToGoString(estDueDate, daysPregnant, daysToGo){
         if(Time.today().greaterThan(estDueDate)){
         	return "Overdue!";
         }
-        var fractionComplete = (100*daysPregnant)/(40*7);
+        var fractionComplete = getPercentageComplete(daysPregnant);
 
         var outStr = "TTG: ";
         var weeksToGo = daysToGo / 7;
@@ -127,7 +131,7 @@ class PregnancyWidgetView extends WatchUi.View {
 
     function getTimePregnantString(estDueDate, daysPregnant, daysToGo){
     	var outStr = "";
-        var fractionComplete = (100*daysPregnant)/(40*7);
+        var fractionComplete = getPercentageComplete(daysPregnant);
         
         //print time elapsed
         var weeksPregnant = daysPregnant / 7;
@@ -140,7 +144,7 @@ class PregnancyWidgetView extends WatchUi.View {
         return outStr;
     }
     
-    function getMiscarriageRiskString(daysPregnant){
+    function getNoMiscarriageRiskString(daysPregnant){
         var outStr;
 
         var riskDayIndex = daysPregnant - 21;
@@ -174,7 +178,52 @@ class PregnancyWidgetView extends WatchUi.View {
         }else{
             outStr += "= "+r.format("%.1f")+"%";
         } 
+        return outStr;
     }
+    
+    function getSizeString(daysPregnant){
+        //Size info:
+        var wksPregnant = daysPregnant / 7;
+        var sizeStr;
+        if(wksPregnant>=41){
+            sizeStr = "Overdue!";
+        } else if(wksPregnant<0){
+            sizeStr = "Too early!";
+        } else {
+            var c = (daysPregnant - wksPregnant*7)/7.0;
+            //interpolate wildly
+            var l = sizeTable[wksPregnant][0] + (sizeTable[wksPregnant+1][0]-sizeTable[wksPregnant][0])*c;
+            var m = sizeTable[wksPregnant][1] + (sizeTable[wksPregnant+1][1]-sizeTable[wksPregnant][1])*c;
+            l = Math.round(l);
+            m = Math.round(m);
+
+            sizeStr = "";
+            if(l < 1){
+                sizeStr += "<1mm\n" ;
+            } else {
+                sizeStr += l.format("%u")+"mm\n" ;
+            }
+            if(m < 1){
+                sizeStr += "<1g";
+            } else {
+                sizeStr += m.format("%u") + "g";
+            }
+        }
+     	return sizeStr; 
+    }
+    
+    function getAngleModulo360(in){
+        //note -- rounds to 1 degree
+    	var tmp = in.toNumber();
+    	while(tmp < 0){
+    		tmp += 360;
+        }
+    	while(tmp >= 360){
+    		tmp -= 360;
+        }
+    	return tmp;
+    }
+    
     
 
     // Update the view
@@ -215,7 +264,12 @@ class PregnancyWidgetView extends WatchUi.View {
         var daysToGo = timeToGoSec / 86400;
         var daysPregnant = Time.today().value() - (estDueDate.value() - 40*7*24*60*60);
         daysPregnant /= (24*60*60); //from sec to days
-
+        
+        // clear the display
+        dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
+        dc.clear();
+        
+		//get text to print
         if(printTimeToGo){
             infoString += getTimeToGoString(estDueDate, daysPregnant, daysToGo);
         }else{
@@ -223,40 +277,13 @@ class PregnancyWidgetView extends WatchUi.View {
         }
 
         if(printMiscarriageRisk){
-        	infoString += getMiscarriageRiskString(daysPregnant);
+        	infoString += getNoMiscarriageRiskString(daysPregnant);
         }else{
         	infoString += getProbSpontaneousLabor(daysPregnant);
         }
         infoString += "\n";
         
-        //Size info:
-        var wksPregnant = daysPregnant / 7;
-        var sizeStr;
-        if(wksPregnant>=41){
-            sizeStr = "Overdue!";
-        } else if(wksPregnant<0){
-            sizeStr = "Too early!";
-        } else {
-            var c = (daysPregnant - wksPregnant*7)/7.0;
-            //interpolate wildly
-            var l = sizeTable[wksPregnant][0] + (sizeTable[wksPregnant+1][0]-sizeTable[wksPregnant][0])*c;
-            var m = sizeTable[wksPregnant][1] + (sizeTable[wksPregnant+1][1]-sizeTable[wksPregnant][1])*c;
-            l = Math.round(l);
-            m = Math.round(m);
-
-            sizeStr = "";
-            if(l < 1){
-                sizeStr += "<1mm\n" ;
-            } else {
-                sizeStr += l.format("%u")+"mm\n" ;
-            }
-            if(m < 1){
-                sizeStr += "<1g";
-            } else {
-                sizeStr += m.format("%u") + "g";
-            }
-        }
-        infoString += sizeStr; 
+        infoString += getSizeString(daysPregnant);
 
         var dataString = "";
         if(randomHeckWord){
@@ -265,8 +292,29 @@ class PregnancyWidgetView extends WatchUi.View {
         dataString += "Due: " + dueDateStr;
         dataString += "\n";
         dataString += infoString;
-        dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
-        dc.clear();
+        
+                
+		//draw progress arc -- 
+        var arcRadius;
+        if(dc.getWidth()>dc.getHeight()){
+        	arcRadius = dc.getHeight()/2;
+        }else{
+        	arcRadius = dc.getWidth()/2;
+        }
+        arcRadius -= 6;
+
+		var startAngle = 85;
+		var rangeAngle = 350;
+        dc.setPenWidth(2);
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT );
+        dc.drawArc(dc.getWidth() / 2, dc.getHeight() / 2, arcRadius, Toybox.Graphics.ARC_CLOCKWISE, startAngle, getAngleModulo360(startAngle - rangeAngle));
+//        System.println(getAngleModulo360(startAngle - rangeAngle).format("%d"));
+
+        dc.setPenWidth(6);
+        dc.setColor(Graphics.COLOR_PURPLE, Graphics.COLOR_TRANSPARENT );
+        dc.drawArc(dc.getWidth() / 2, dc.getHeight() / 2, arcRadius, Toybox.Graphics.ARC_CLOCKWISE, startAngle, getAngleModulo360(startAngle - getPercentageComplete(daysPregnant)/100.0*rangeAngle));
+
+		//draw text
         dc.setColor( Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT );
         dc.drawText( dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_TINY, dataString, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER );
     }
