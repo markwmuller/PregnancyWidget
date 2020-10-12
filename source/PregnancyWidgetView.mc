@@ -15,51 +15,53 @@ var riskArray_21dOut = [33, 32.9, 32.6, 32, 31.3, 30.3, 29.2, 28, 26.6, 25.2,
                         3.2, 3, 2.8, 2.6, 2.5, 2.4, 2.3, 2.2, 2.2, 2.1,
                         2.1, 2.1, 2.1, 2, ];
                         
-// size table, indexed by wks: [mm, g] from http://perinatology.com/Reference/Fetal%20development.htm
-// days are gestational, since LMP
+// size table, indexed by wks: [wks, mm, g] from https://www.babycenter.com/pregnancy/your-body/growth-chart-fetal-length-and-weight-week-by-week_1290794
+// wks are gestational, since LMP
+// Extrapolated data below 8 wks
 var sizeTable = [
-    [0, 0],
-    [0, 0],
-    [0, 0],
-    [0, 0],
-    [1, 0],
-    [2, 0],
-    [4, 0],
-    [10, 1],
-    [16, 5],
-    [23, 15],
-    [32, 35],
-    [42, 45], 
-    [53, 58], 
-    [65, 73], 
-    [79, 93],
-    [164, 117],
-    [183, 146], 
-    [201, 181], 
-    [220, 223], 
-    [237, 273], 
-    [255, 331], 
-    [272, 399], 
-    [288, 478], 
-    [304, 568], 
-    [320, 670], 
-    [336, 785], 
-    [351, 913], 
-    [365, 1055], 
-    [379, 1210], 
-    [393, 1379], 
-    [406, 1559], 
-    [419, 1751], 
-    [432, 1953], 
-    [444, 2162], 
-    [456, 2377], 
-    [467, 2595], 
-    [478, 2813], 
-    [489, 3028], 
-    [499, 3236], 
-    [509, 3435], 
-    [520, 3619], 
-    [527, 3787], 
+			[0, 0, 0],
+			[1, 0, 0],
+			[2, 0, 0],
+			[3, 0, 0],
+			[4, 0, 0],
+			[5, 1, 0],
+			[6, 7, 0],
+			[7, 11, 0],
+			[8, 16, 1],
+			[9, 23, 2],
+			[10, 31, 4],
+			[11, 41, 7],
+			[12, 54, 14],
+			[13, 74, 23],
+			[14, 87, 43],
+			[15, 101, 70],
+			[16, 116, 100],
+			[17, 130, 140],
+			[18, 142, 190],
+			[19, 153, 240],
+			[20, 256, 300],
+			[21, 267, 360],
+			[22, 278, 430],
+			[23, 289, 501],
+			[24, 300, 600],
+			[25, 346, 660],
+			[26, 356, 760],
+			[27, 366, 875],
+			[28, 376, 1005],
+			[29, 386, 1153],
+			[30, 399, 1319],
+			[31, 411, 1502],
+			[32, 424, 1702],
+			[33, 437, 1918],
+			[34, 450, 2146],
+			[35, 462, 2383],
+			[36, 474, 2622],
+			[37, 486, 2859],
+			[38, 498, 3083],
+			[39, 507, 3288],
+			[40, 512, 3462],
+			[41, 517, 3597],
+			[42, 515, 3685],
     ];
     
 var heckWordTable = [
@@ -192,8 +194,8 @@ class PregnancyWidgetView extends WatchUi.View {
         } else {
             var c = (daysPregnant - wksPregnant*7)/7.0;
             //interpolate wildly
-            var l = sizeTable[wksPregnant][0] + (sizeTable[wksPregnant+1][0]-sizeTable[wksPregnant][0])*c;
-            var m = sizeTable[wksPregnant][1] + (sizeTable[wksPregnant+1][1]-sizeTable[wksPregnant][1])*c;
+            var l = sizeTable[wksPregnant][1] + (sizeTable[wksPregnant+1][1]-sizeTable[wksPregnant][1])*c;
+            var m = sizeTable[wksPregnant][2] + (sizeTable[wksPregnant+1][2]-sizeTable[wksPregnant][2])*c;
             l = Math.round(l);
             m = Math.round(m);
 
@@ -311,7 +313,7 @@ class PregnancyWidgetView extends WatchUi.View {
 //        System.println(getAngleModulo360(startAngle - rangeAngle).format("%d"));
 
         dc.setPenWidth(6);
-        dc.setColor(Graphics.COLOR_PURPLE, Graphics.COLOR_TRANSPARENT );
+        dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT );
         dc.drawArc(dc.getWidth() / 2, dc.getHeight() / 2, arcRadius, Toybox.Graphics.ARC_CLOCKWISE, startAngle, getAngleModulo360(startAngle - getPercentageComplete(daysPregnant)/100.0*rangeAngle));
 
 		//draw text
