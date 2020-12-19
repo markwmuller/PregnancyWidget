@@ -1,3 +1,13 @@
 <strings>
     <string id="AppName">Pregnancy tracker</string>
+    
+	<string id="dueDateYear">Estimated due date (year, e.g. "2021")</string>
+	<string id="dueDateMonth">Estimated due date (month, e.g. "8")</string>
+	<string id="dueDateDay">Estimated due date (day, e.g. "17")</string>
+    
+
+    <string id="printHeckWord">Print a random heck word?</string>
+    <string id="printTimeToGo">Print time to go, rather than time elapsed?</string>
+    <string id="printMiscarriageRisk">Print miscarriage risk, rather than spontaneous labour?</string>
+
 </strings>

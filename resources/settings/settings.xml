@@ -1,0 +1,28 @@
+<settings>
+    
+    <setting propertyKey="@Properties.dueDateYear" title="@Strings.dueDateYear">
+        <settingConfig type="numeric" />
+    </setting>
+    
+    <setting propertyKey="@Properties.dueDateMonth" title="@Strings.dueDateMonth">
+        <settingConfig type="numeric" />
+    </setting>
+    
+    <setting propertyKey="@Properties.dueDateDay" title="@Strings.dueDateDay">
+        <settingConfig type="numeric" />
+    </setting>
+    
+    <setting propertyKey="@Properties.printHeckWord" title="@Strings.printHeckWord">
+        <settingConfig type="boolean" />
+    </setting>
+    
+    <setting propertyKey="@Properties.printTimeToGo" title="@Strings.printTimeToGo">
+        <settingConfig type="boolean" />
+    </setting>
+    
+    <setting propertyKey="@Properties.printMiscarriageRisk" title="@Strings.printMiscarriageRisk">
+        <settingConfig type="boolean" />
+    </setting>
+    
+
+</settings>
