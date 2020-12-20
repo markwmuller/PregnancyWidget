@@ -1,8 +1,8 @@
 # Pregnancy countdown
 
-See it in the connect store TODO [here](https://apps.garmin.com/en-US/apps/7439bd5d-f095-486e-a1d9-4d931ced7ebe).
+See it in the connect store [here](https://apps.garmin.com/en-US/apps/7439bd5d-f095-486e-a1d9-4d931ced7ebe).
 
-TODO![Default look](https://github.com/markwmuller/PregnancyWidget/blob/master/image.png)
+![Default look](https://github.com/markwmuller/PregnancyWidget/blob/master/image.png)
 
 # Title
 
@@ -14,7 +14,7 @@ Are you excited about an incoming baby? Me too!
 
 This open source widget gives you some quick relevant info at a glance. I made it when I found out my wife was pregnant, and it was a way to turn my panic into semi-productivity. 
 
-Enter the due date, and the widget calculates some basic statistics (progress, wheight and length, remaining likelihood of miscarriage (early on) and likelikhood of spontaneous birth soon (later on). 
+Enter the due date, and the widget calculates some basic statistics (progress, weight and length, remaining likelihood of miscarriage (early on) and likelihood of spontaneous birth soon (later on)). 
 
 Privacy notice: No information ever leaves your device. 
 
@@ -25,6 +25,7 @@ The baby length & mass are estimated too, with data taken from [here](https://ww
 I also calculate the probability of spontaneous birth within the next seven days, using data estimated from ""The length of human pregnancy as calculated by ultrasonoggraphic measurement of the fetal biparietal diameter" by Kieler et al., Fig. 1.
 Note "spontaneous birth" means not-induced; but for some bizarro reason does not include premature birth. It also excludes multiples.
 See the python script `spontaneousPregnancyPDFApproximation.py` for info on how this data is manipulated. 
+Specifically, I try to estimate the probability that the baby will be born in the next seven days, given that it has not been born yet.
 
 The icon is from [here](https://www.freevector.com/pregnancy-icon-set-21124).
 
