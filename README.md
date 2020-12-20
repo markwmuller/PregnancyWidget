@@ -1,8 +1,8 @@
 # Pregnancy countdown
 
-See it in the connect store TODO [here](https://apps.garmin.com/en-US/apps/XXX).
+See it in the connect store TODO [here](https://apps.garmin.com/en-US/apps/7439bd5d-f095-486e-a1d9-4d931ced7ebe).
 
-TODO![Default look](https://github.com/markwmuller/XXX)
+TODO![Default look](https://github.com/markwmuller/PregnancyWidget/blob/master/image.png)
 
 # Title
 
