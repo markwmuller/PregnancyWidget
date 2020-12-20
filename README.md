@@ -6,7 +6,7 @@ TODO![Default look](https://github.com/markwmuller/XXX)
 
 # Title
 
-Pregnancy countdown
+Pregnancy countdown & statistics
 
 #  Description (Maximum 4,000 Characters)
 
@@ -28,7 +28,7 @@ See the python script `spontaneousPregnancyPDFApproximation.py` for info on how 
 
 The icon is from [here](https://www.freevector.com/pregnancy-icon-set-21124).
 
-Of course, this widget should be treated as a bit of fun by an excited dad-to-be; for any serious matters please refer to your healthcare professionals (not some random engineer). 
+Of course, this widget should be treated as a bit of fun by an excited dad/mom-to-be; for any serious matters please refer to your healthcare professionals (not some random engineer). 
 
 
 #  What’s New (Optional) (Maximum 4,000 Characters)

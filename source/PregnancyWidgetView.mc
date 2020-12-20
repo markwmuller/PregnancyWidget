@@ -151,12 +151,12 @@ class PregnancyWidgetView extends WatchUi.View {
 
         var riskDayIndex = daysPregnant - 21;
         if(riskDayIndex >= riskArray_21dOut.size()){
-            outStr = "P[misc]<2%";
+            outStr = "P[mscrg]<2%";
         } else if (riskDayIndex < 0){
         // no risk data
             outStr = "";
         } else {
-            outStr = "P[2]="+(riskArray_21dOut[riskDayIndex]).format("%.1f")+"%";
+            outStr = "P[mscrg]="+(riskArray_21dOut[riskDayIndex]).format("%.1f")+"%";
         }
         return outStr;
     }
@@ -242,6 +242,14 @@ class PregnancyWidgetView extends WatchUi.View {
         var randomHeckWord = Application.Properties.getValue("printHeckWord"); 
         var printTimeToGo = Application.Properties.getValue("printTimeToGo"); //else, print time pregnant (since LMP)
         var printMiscarriageRisk = Application.Properties.getValue("printMiscarriageRisk");  //else, probability of spontaneous labor
+        
+        if(dueYear == 0){
+			dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
+			dc.clear();
+			dc.setColor( Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT );
+			dc.drawText( dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_TINY, "Please enter\ndue date\nin settings", Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER );
+			return;
+        }
     	
         var options = {
             :year   => dueYear,

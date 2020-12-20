@@ -1,8 +1,8 @@
 <properties>
 
-    <property id="dueDateYear" type="number">2021</property>
-    <property id="dueDateMonth" type="number">8</property>
-    <property id="dueDateDay" type="number">17</property>
+    <property id="dueDateYear" type="number">0</property>
+    <property id="dueDateMonth" type="number">0</property>
+    <property id="dueDateDay" type="number">0</property>
 
     <property id="printHeckWord" type="boolean">True</property>
     <property id="printTimeToGo" type="boolean">False</property>
