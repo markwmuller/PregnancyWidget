@@ -6,7 +6,7 @@ See it in the connect store [here](https://apps.garmin.com/en-US/apps/7439bd5d-f
 
 # Title
 
-Pregnancy countdown & statistics
+Pregnancy countdown 
 
 #  Description (Maximum 4,000 Characters)
 
@@ -14,23 +14,17 @@ Are you excited about an incoming baby? Me too!
 
 This open source widget gives you some quick relevant info at a glance. I made it when I found out my wife was pregnant, and it was a way to turn my panic into semi-productivity. 
 
-Enter the due date, and the widget calculates some basic statistics (progress, weight and length, remaining likelihood of miscarriage (early on) and likelihood of spontaneous birth soon (later on)). 
+Enter the due date, and the widget calculates some basic predicted approximate statistics (progress, the baby's approximate weight and approximate length). 
 
-Privacy notice: No information ever leaves your device. 
+This app is not intended to be used for the purposes of medical treatment and is intended for educational purposes only. This widget should be treated as a bit of fun by an excited dad/mom-to-be; for any serious matters please refer to your healthcare professionals (not some random engineer). 
 
-Early on, it shows the probability of miscarriage (my biggest fear at the time). Numbers are from [here](https://spacefem.com/)
+*Privacy notice: No information ever leaves your device. There is nothing tracking you here.* 
 
-The baby length & mass are estimated too, with data taken from [here](https://www.babycenter.com/pregnancy/your-body/growth-chart-fetal-length-and-weight-week-by-week_1290794)
+The baby length & mass are estimated with data taken from here -- https://www.babycenter.com/pregnancy/your-body/growth-chart-fetal-length-and-weight-week-by-week_1290794
 
-I also calculate the probability of spontaneous birth within the next seven days, using data estimated from ""The length of human pregnancy as calculated by ultrasonoggraphic measurement of the fetal biparietal diameter" by Kieler et al., Fig. 1.
-Note "spontaneous birth" means not-induced; but for some bizarro reason does not include premature birth. It also excludes multiples.
-See the python script `spontaneousPregnancyPDFApproximation.py` for info on how this data is manipulated. 
-Specifically, I try to estimate the probability that the baby will be born in the next seven days, given that it has not been born yet.
+The icon is from here -- https://www.freevector.com/pregnancy-icon-set-21124
 
-The icon is from [here](https://www.freevector.com/pregnancy-icon-set-21124).
-
-Of course, this widget should be treated as a bit of fun by an excited dad/mom-to-be; for any serious matters please refer to your healthcare professionals (not some random engineer). 
-
+The source code for this widget is here -- https://github.com/markwmuller/PregnancyWidget
 
 #  What’s New (Optional) (Maximum 4,000 Characters)
 **V0.1**

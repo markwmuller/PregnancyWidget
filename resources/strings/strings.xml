@@ -8,6 +8,5 @@
 
     <string id="printHeckWord">Print a random heck word?</string>
     <string id="printTimeToGo">Print time to go, rather than time elapsed?</string>
-    <string id="printMiscarriageRisk">Print miscarriage risk, rather than spontaneous labour?</string>
 
 </strings>

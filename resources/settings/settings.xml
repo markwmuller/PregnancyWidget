@@ -20,9 +20,4 @@
         <settingConfig type="boolean" />
     </setting>
     
-    <setting propertyKey="@Properties.printMiscarriageRisk" title="@Strings.printMiscarriageRisk">
-        <settingConfig type="boolean" />
-    </setting>
-    
-
 </settings>

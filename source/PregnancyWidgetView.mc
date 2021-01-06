@@ -15,6 +15,7 @@ var riskArray_21dOut = [33, 32.9, 32.6, 32, 31.3, 30.3, 29.2, 28, 26.6, 25.2,
                         3.2, 3, 2.8, 2.6, 2.5, 2.4, 2.3, 2.2, 2.2, 2.1,
                         2.1, 2.1, 2.1, 2, ];
                         
+                        
 // size table, indexed by wks: [wks, mm, g] from https://www.babycenter.com/pregnancy/your-body/growth-chart-fetal-length-and-weight-week-by-week_1290794
 // wks are gestational, since LMP
 // Extrapolated data below 8 wks
@@ -234,14 +235,16 @@ class PregnancyWidgetView extends WatchUi.View {
     		return;
         }
         shouldUpdate = false;
-    	//things that should be settings:
+        //read our settings:
     	var dueYear = Application.Properties.getValue("dueDateYear");
     	var dueMonth = Application.Properties.getValue("dueDateMonth");
     	var dueDay = Application.Properties.getValue("dueDateDay");
 
         var randomHeckWord = Application.Properties.getValue("printHeckWord"); 
         var printTimeToGo = Application.Properties.getValue("printTimeToGo"); //else, print time pregnant (since LMP)
-        var printMiscarriageRisk = Application.Properties.getValue("printMiscarriageRisk");  //else, probability of spontaneous labor
+        var printMiscarriageRisk = false; //hardcoded false for connectiq approval 
+        var printProbSpontaneousLabor = false; //hardcoded false for connectiq approval
+//        var printMiscarriageRisk = Application.Properties.getValue("printMiscarriageRisk");  
         
         if(dueYear == 0){
 			dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
@@ -250,7 +253,7 @@ class PregnancyWidgetView extends WatchUi.View {
 			dc.drawText( dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_TINY, "Please enter\ndue date\nin settings", Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER );
 			return;
         }
-    	
+    	 
         var options = {
             :year   => dueYear,
             :month  => dueMonth,
@@ -289,10 +292,11 @@ class PregnancyWidgetView extends WatchUi.View {
 
         if(printMiscarriageRisk){
         	infoString += getMiscarriageRisk(daysPregnant);
-        }else{
+            infoString += "\n";
+        }else if(printProbSpontaneousLabor) {
         	infoString += getProbSpontaneousLabor(daysPregnant);
+            infoString += "\n";
         }
-        infoString += "\n";
         
         infoString += getSizeString(daysPregnant);
 

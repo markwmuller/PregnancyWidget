@@ -6,6 +6,5 @@
 
     <property id="printHeckWord" type="boolean">True</property>
     <property id="printTimeToGo" type="boolean">False</property>
-    <property id="printMiscarriageRisk" type="boolean">True</property>
 
 </properties>
