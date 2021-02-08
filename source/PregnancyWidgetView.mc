@@ -69,16 +69,12 @@ var heckWordTable = [
 	
 class PregnancyWidgetView extends WatchUi.View {
 
-	var shouldUpdate;
-
     function initialize() {
-        shouldUpdate = true;
         View.initialize();
     }
 
     // Load your resources here
     function onLayout(dc) {
-        shouldUpdate = true;
         setLayout(Rez.Layouts.MainLayout(dc));
     }
 
@@ -86,7 +82,6 @@ class PregnancyWidgetView extends WatchUi.View {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() {
-    	shouldUpdate = true;
         WatchUi.requestUpdate();
     }
     
@@ -179,10 +174,6 @@ class PregnancyWidgetView extends WatchUi.View {
 
     // Update the view
     function onUpdate(dc) {
-    	if(!shouldUpdate){
-    		return;
-        }
-        shouldUpdate = false;
         //read our settings:
     	var dueYear = Application.Properties.getValue("dueDateYear");
     	var dueMonth = Application.Properties.getValue("dueDateMonth");
@@ -190,6 +181,8 @@ class PregnancyWidgetView extends WatchUi.View {
 
         var randomHeckWord = Application.Properties.getValue("printHeckWord"); 
         var printTimeToGo = Application.Properties.getValue("printTimeToGo"); //else, print time pregnant (since LMP)
+        
+        var accentColor = Application.Properties.getValue("accentColor"); 
         
         if(dueYear == 0){
         	//settings aren't valid -- tell user to update
@@ -259,7 +252,17 @@ class PregnancyWidgetView extends WatchUi.View {
 //        System.println(getAngleModulo360(startAngle - rangeAngle).format("%d"));
 
         dc.setPenWidth(6);
-        dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT );
+        if(accentColor == 2){
+            dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT );
+        } else if(accentColor == 3){
+            dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT );
+        } else if(accentColor == 4){
+            dc.setColor(Graphics.COLOR_PINK, Graphics.COLOR_TRANSPARENT );
+        } else if(accentColor == 5){
+            dc.setColor(Graphics.COLOR_ORANGE, Graphics.COLOR_TRANSPARENT );
+        }else{//default
+            dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT );
+        }
         dc.drawArc(dc.getWidth() / 2, dc.getHeight() / 2, arcRadius, Toybox.Graphics.ARC_CLOCKWISE, startAngle, getAngleModulo360(startAngle - getPercentageComplete(daysPregnant)/100.0*rangeAngle));
 
 		//draw text

@@ -9,4 +9,12 @@
     <string id="printHeckWord">Print a random heck word?</string>
     <string id="printTimeToGo">Print time to go, rather than time elapsed?</string>
 
+    <string id="accentColor">Accent color</string>
+
+    <string id="Green">Green</string>
+    <string id="Blue">Blue</string>
+    <string id="Red">Red</string>
+    <string id="Pink">Pink</string>
+    <string id="Orange">Orange</string>
+
 </strings>

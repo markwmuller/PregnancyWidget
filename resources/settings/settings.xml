@@ -20,4 +20,13 @@
         <settingConfig type="boolean" />
     </setting>
     
+    <setting propertyKey="@Properties.accentColor" title="@Strings.accentColor">
+        <settingConfig type="list">
+            <listEntry value="1">@Strings.Green</listEntry>
+            <listEntry value="2">@Strings.Blue</listEntry>
+            <listEntry value="3">@Strings.Red</listEntry>
+            <listEntry value="4">@Strings.Pink</listEntry>
+            <listEntry value="5">@Strings.Orange</listEntry>
+        </settingConfig>
+    </setting>
 </settings>

@@ -27,6 +27,9 @@ The icon is from here -- https://www.freevector.com/pregnancy-icon-set-21124
 The source code for this widget is here -- https://github.com/markwmuller/PregnancyWidget
 
 #  What’s New (Optional) (Maximum 4,000 Characters)
+-Version 0.1.4
+* Added option to change accent color
+* Hopefully fixed bug where screen flashes blank
 -Version 0.1.3
 * Cleaned up settings strings to be cleaner.
 -Version 0.1.0

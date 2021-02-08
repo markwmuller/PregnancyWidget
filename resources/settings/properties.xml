@@ -7,4 +7,6 @@
     <property id="printHeckWord" type="boolean">True</property>
     <property id="printTimeToGo" type="boolean">False</property>
 
+    <property id="accentColor" type="number">1</property>
+
 </properties>
