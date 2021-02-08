@@ -8,14 +8,6 @@ using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.WatchUi;
 
-//from spacefem. Starts at 21 days. only valid to 21+44=65days
-var riskArray_21dOut = [33, 32.9, 32.6, 32, 31.3, 30.3, 29.2, 28, 26.6, 25.2,
-                        23.6, 22.1, 20.5, 18.9, 17.3, 15.8, 14.4, 13, 11.7, 10.5,
-                        9.4, 8.4, 7.5, 6.6, 5.9, 5.3, 4.7, 4.3, 3.9, 3.5,
-                        3.2, 3, 2.8, 2.6, 2.5, 2.4, 2.3, 2.2, 2.2, 2.1,
-                        2.1, 2.1, 2.1, 2, ];
-                        
-                        
 // size table, indexed by wks: [wks, mm, g] from https://www.babycenter.com/pregnancy/your-body/growth-chart-fetal-length-and-weight-week-by-week_1290794
 // wks are gestational, since LMP
 // Extrapolated data below 8 wks
@@ -75,15 +67,6 @@ var heckWordTable = [
 	"Incoming!",
 	]; 
 	
-//day, CDF value (see python script)
-var cdfBornTable = [
-      [246.42487046632124, 0.0],
-      [267.6683937823834, 0.10108238090513785],
-      [280.62176165803106, 0.5174984949848987],
-      [298.2383419689119, 0.9999999966998467],
-	]; 
-
-
 class PregnancyWidgetView extends WatchUi.View {
 
 	var shouldUpdate;
@@ -95,14 +78,16 @@ class PregnancyWidgetView extends WatchUi.View {
 
     // Load your resources here
     function onLayout(dc) {
-        setLayout(Rez.Layouts.MainLayout(dc));//draws a monkey
+        shouldUpdate = true;
+        setLayout(Rez.Layouts.MainLayout(dc));
     }
 
     // Called when this View is brought to the foreground. Restore
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() {
-        shouldUpdate = true;
+    	shouldUpdate = true;
+        WatchUi.requestUpdate();
     }
     
     function getHeckWord(){
@@ -144,43 +129,6 @@ class PregnancyWidgetView extends WatchUi.View {
         outStr +=  (daysPregnant - weeksPregnant*7).format("%u")+"d ";
         outStr += "(" + fractionComplete.format("%u") + "%)\n";
 
-        return outStr;
-    }
-    
-    function getMiscarriageRisk(daysPregnant){
-        var outStr;
-
-        var riskDayIndex = daysPregnant - 21;
-        if(riskDayIndex >= riskArray_21dOut.size()){
-            outStr = "P[mscrg]<2%";
-        } else if (riskDayIndex < 0){
-        // no risk data
-            outStr = "";
-        } else {
-            outStr = "P[mscrg]="+(riskArray_21dOut[riskDayIndex]).format("%.1f")+"%";
-        }
-        return outStr;
-    }
-    
-    function getProbSpontaneousLabor(daysPregnant){
-        //compute the approx. likelihood of spontaneous labor. 
-        var outStr = "P[SL_1wk] ";
-        var cdf_val_in1Wk = cdf_born_by(daysPregnant+7);
-        var cdf_val_today = cdf_born_by(daysPregnant);
-        var r;
-        //bayes' rule
-        if(cdf_val_today >= 1){
-            //avoid divide by zero
-            r = 1;
-        } else {
-            r = (cdf_val_in1Wk-cdf_val_today)/(1-cdf_val_today);
-        }
-        r *= 100;
-        if(r < 0.01){
-            outStr += "< 0.01% *";
-        }else{
-            outStr += "= "+r.format("%.1f")+"%";
-        } 
         return outStr;
     }
     
@@ -242,11 +190,9 @@ class PregnancyWidgetView extends WatchUi.View {
 
         var randomHeckWord = Application.Properties.getValue("printHeckWord"); 
         var printTimeToGo = Application.Properties.getValue("printTimeToGo"); //else, print time pregnant (since LMP)
-        var printMiscarriageRisk = false; //hardcoded false for connectiq approval 
-        var printProbSpontaneousLabor = false; //hardcoded false for connectiq approval
-//        var printMiscarriageRisk = Application.Properties.getValue("printMiscarriageRisk");  
         
         if(dueYear == 0){
+        	//settings aren't valid -- tell user to update
 			dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
 			dc.clear();
 			dc.setColor( Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT );
@@ -270,8 +216,6 @@ class PregnancyWidgetView extends WatchUi.View {
 
         var dueDateStr = Lang.format("$1$-$2$-$3$", [ info.year.format("%04u"), info.month.format("%02u"), info.day.format("%02u") ]);
 
-        var infoString = "";
-
         //some useful numbers
         var timeToGo = estDueDate.subtract(Time.now());
         var timeToGoSec = timeToGo.value();
@@ -279,36 +223,25 @@ class PregnancyWidgetView extends WatchUi.View {
         var daysPregnant = Time.today().value() - (estDueDate.value() - 40*7*24*60*60);
         daysPregnant /= (24*60*60); //from sec to days
         
-        // clear the display
-        dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
-        dc.clear();
-        
-		//get text to print
-        if(printTimeToGo){
-            infoString += getTimeToGoString(estDueDate, daysPregnant, daysToGo);
-        }else{
-            infoString += getTimePregnantString(estDueDate, daysPregnant, daysToGo);
-        }
-
-        if(printMiscarriageRisk){
-        	infoString += getMiscarriageRisk(daysPregnant);
-            infoString += "\n";
-        }else if(printProbSpontaneousLabor) {
-        	infoString += getProbSpontaneousLabor(daysPregnant);
-            infoString += "\n";
-        }
-        
-        infoString += getSizeString(daysPregnant);
-
         var dataString = "";
         if(randomHeckWord){
         	dataString += getHeckWord() + "\n";
         }
         dataString += "Due: " + dueDateStr;
         dataString += "\n";
-        dataString += infoString;
-        
-                
+
+		//get text to print
+        if(printTimeToGo){
+            dataString += getTimeToGoString(estDueDate, daysPregnant, daysToGo);
+        }else{
+            dataString += getTimePregnantString(estDueDate, daysPregnant, daysToGo);
+        }
+
+        dataString += getSizeString(daysPregnant);
+
+        // clear the display
+        dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
+        dc.clear();
 		//draw progress arc -- 
         var arcRadius;
         if(dc.getWidth()>dc.getHeight()){
@@ -340,29 +273,4 @@ class PregnancyWidgetView extends WatchUi.View {
     function onHide() {
     }
 
-    function cdf_born_by(daysPreg) {
-    //using data from this paper, with my own hand-baked piecewise linear approximation
-    // The length of human pregnancy as calculated by ultrasonographic measurement of the fetal biparietal diameter
-    // Dr H. Kieler O. Axelsson S. Nilsson U. Waldenströ
-    	//read from our table, and interpolate wildly! 
-    	if(daysPreg < cdfBornTable[0][0]){
-            return 0.0;
-        }
-        //we'll need to look up --
-        var i = 1;
-        while(true){
-        	if(i >= cdfBornTable.size()){
-        		return 1;
-            }
-            if(cdfBornTable[i][0] > daysPreg){
-                break;
-            }
-            i += 1;
-        }
-        var x0 = cdfBornTable[i-1][0];
-        var x1 = cdfBornTable[i][0];
-        var y0 = cdfBornTable[i-1][1];
-        var y1 = cdfBornTable[i][1];
-        return y0 + (daysPreg-x0)/(x1-x0)*(y1-y0);
-    }
 }
