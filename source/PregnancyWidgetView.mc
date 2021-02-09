@@ -260,6 +260,8 @@ class PregnancyWidgetView extends WatchUi.View {
             dc.setColor(Graphics.COLOR_PINK, Graphics.COLOR_TRANSPARENT );
         } else if(accentColor == 5){
             dc.setColor(Graphics.COLOR_ORANGE, Graphics.COLOR_TRANSPARENT );
+        } else if(accentColor == 6){
+            dc.setColor(Graphics.COLOR_PURPLE, Graphics.COLOR_TRANSPARENT );
         }else{//default
             dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT );
         }

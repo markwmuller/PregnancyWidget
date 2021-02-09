@@ -27,6 +27,7 @@
             <listEntry value="3">@Strings.Red</listEntry>
             <listEntry value="4">@Strings.Pink</listEntry>
             <listEntry value="5">@Strings.Orange</listEntry>
+            <listEntry value="6">@Strings.Purple</listEntry>
         </settingConfig>
     </setting>
 </settings>
