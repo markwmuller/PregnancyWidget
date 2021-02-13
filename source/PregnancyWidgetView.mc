@@ -8,7 +8,7 @@ using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.WatchUi;
 
-// size table, indexed by wks: [wks, mm, g] from https://www.babycenter.com/pregnancy/your-body/growth-chart-fetal-length-and-weight-week-by-week_1290794
+// size table, indexed by wks: [age (wks), length (mm), mass (g)] from https://www.babycenter.com/pregnancy/your-body/growth-chart-fetal-length-and-weight-week-by-week_1290794
 // wks are gestational, since LMP
 // Extrapolated data below 8 wks
 var sizeTable = [
@@ -91,15 +91,15 @@ class PregnancyWidgetView extends WatchUi.View {
         return heckWordTable[randInt];
     }
     
-    function getPercentageComplete(daysPregnant){
-        return (100*daysPregnant)/(40*7);
+    function getPercentageComplete(secondsPregnant){
+        return (100.0*secondsPregnant)/(40*7*24*60*60);
     }
     
-    function getTimeToGoString(estDueDate, daysPregnant, daysToGo){
+    function getTimeToGoString(estDueDate, secondsPregnant, daysToGo){
         if(Time.today().greaterThan(estDueDate)){
         	return "Overdue!";
         }
-        var fractionComplete = getPercentageComplete(daysPregnant);
+        var fractionComplete = getPercentageComplete(secondsPregnant);
 
         var outStr = "TTG: ";
         var weeksToGo = daysToGo / 7;
@@ -112,11 +112,12 @@ class PregnancyWidgetView extends WatchUi.View {
         return outStr;
     }
 
-    function getTimePregnantString(estDueDate, daysPregnant, daysToGo){
+    function getTimePregnantString(estDueDate, secondsPregnant, daysToGo){
     	var outStr = "";
-        var fractionComplete = getPercentageComplete(daysPregnant);
+        var fractionComplete = getPercentageComplete(secondsPregnant);
         
         //print time elapsed
+        var daysPregnant = secondsPregnant / (24*60*60);
         var weeksPregnant = daysPregnant / 7;
         if (weeksPregnant > 0){
             outStr += weeksPregnant.format("%u")+"wk, ";
@@ -127,16 +128,16 @@ class PregnancyWidgetView extends WatchUi.View {
         return outStr;
     }
     
-    function getSizeString(daysPregnant){
+    function getSizeString(secondsPregnant){
         //Size info:
-        var wksPregnant = daysPregnant / 7;
+        var wksPregnant = secondsPregnant / (7*24*60*60);
         var sizeStr;
         if(wksPregnant>=41){
             sizeStr = "Overdue!";
         } else if(wksPregnant<0){
             sizeStr = "Too early!";
         } else {
-            var c = (daysPregnant - wksPregnant*7)/7.0;
+            var c = (secondsPregnant - wksPregnant*7*24*60*60)/(7.0*24*60*60);//fraction of week completed, should be in [0,1)
             //interpolate wildly
             var l = sizeTable[wksPregnant][1] + (sizeTable[wksPregnant+1][1]-sizeTable[wksPregnant][1])*c;
             var m = sizeTable[wksPregnant][2] + (sizeTable[wksPregnant+1][2]-sizeTable[wksPregnant][2])*c;
@@ -213,8 +214,7 @@ class PregnancyWidgetView extends WatchUi.View {
         var timeToGo = estDueDate.subtract(Time.now());
         var timeToGoSec = timeToGo.value();
         var daysToGo = timeToGoSec / 86400;
-        var daysPregnant = Time.today().value() - (estDueDate.value() - 40*7*24*60*60);
-        daysPregnant /= (24*60*60); //from sec to days
+        var secondsPregnant = Time.today().value() - (estDueDate.value() - 40*7*24*60*60);
         
         var dataString = "";
         if(randomHeckWord){
@@ -225,12 +225,12 @@ class PregnancyWidgetView extends WatchUi.View {
 
 		//get text to print
         if(printTimeToGo){
-            dataString += getTimeToGoString(estDueDate, daysPregnant, daysToGo);
+            dataString += getTimeToGoString(estDueDate, secondsPregnant, daysToGo);
         }else{
-            dataString += getTimePregnantString(estDueDate, daysPregnant, daysToGo);
+            dataString += getTimePregnantString(estDueDate, secondsPregnant, daysToGo);
         }
 
-        dataString += getSizeString(daysPregnant);
+        dataString += getSizeString(secondsPregnant);
 
         // clear the display
         dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );
@@ -265,8 +265,12 @@ class PregnancyWidgetView extends WatchUi.View {
         }else{//default
             dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT );
         }
-        dc.drawArc(dc.getWidth() / 2, dc.getHeight() / 2, arcRadius, Toybox.Graphics.ARC_CLOCKWISE, startAngle, getAngleModulo360(startAngle - getPercentageComplete(daysPregnant)/100.0*rangeAngle));
-
+        var percentCompleteCapped = getPercentageComplete(secondsPregnant);
+        if(percentCompleteCapped > 100){
+            percentCompleteCapped = 100;
+        }
+        dc.drawArc(dc.getWidth() / 2, dc.getHeight() / 2, arcRadius, Toybox.Graphics.ARC_CLOCKWISE, startAngle, getAngleModulo360(startAngle - percentCompleteCapped/100.0*rangeAngle));
+        
 		//draw text
         dc.setColor( Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT );
         dc.drawText( dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_TINY, dataString, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER );
