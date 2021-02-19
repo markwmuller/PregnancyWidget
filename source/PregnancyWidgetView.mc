@@ -214,7 +214,7 @@ class PregnancyWidgetView extends WatchUi.View {
         var timeToGo = estDueDate.subtract(Time.now());
         var timeToGoSec = timeToGo.value();
         var daysToGo = timeToGoSec / 86400;
-        var secondsPregnant = Time.today().value() - (estDueDate.value() - 40*7*24*60*60);
+        var secondsPregnant = Time.now().value() - (estDueDate.value() - 40*7*24*60*60);
         
         var dataString = "";
         if(randomHeckWord){
