@@ -159,19 +159,27 @@ class PregnancyWidgetView extends WatchUi.View {
             }else{
             	l = l / 25.4; //mm to inches
             	m = m / 28.34952; //g to oz
-//				l = Math.round(l*100)/100;
-//				m = Math.round(m*100)/100;
 
 				sizeStr = "";
-				if(l < 1){
+				if(l < 0.04){
 					sizeStr += "<0.04in\n" ;
-				} else {
+                }else if(l < 1){
 					sizeStr += l.format("%.2f")+"in\n" ;
-				}
-				if(m < 1){
-					sizeStr += "<0.04oz";
 				} else {
+					sizeStr += l.format("%.1f")+"in\n" ;
+				}
+				if(m < 0.04){
+					sizeStr += "<0.04oz";
+				} else if(m < 1) {
 					sizeStr += m.format("%.2f") + "oz";
+				} else if(m < 16) {
+                    //less than 1lb
+					sizeStr += m.format("%.2f") + "oz";
+				} else {
+                    //16 oz in 1 lb, it turns out...
+                    var lb = Math.floor(m).toNumber() / 16;
+                    var oz = m - lb*16;
+					sizeStr += lb.format("%u") + "lb, " + oz.format("%.1f") + "oz";
 				}
             }
         }

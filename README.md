@@ -27,21 +27,24 @@ The icon is from here -- https://www.freevector.com/pregnancy-icon-set-21124
 The source code for this widget is here -- https://github.com/markwmuller/PregnancyWidget
 
 #  What’s New (Optional) (Maximum 4,000 Characters)
+
+-Version 0.2.1
+  * slight bug fix in oz & in, now shows lb when mass is bigger than 1lb (for everyone's sanity, can the US please just switch to metric?)
 -Version 0.2.0
-* Enable new devices
-* Allow to use custom title (instead of random heck words)
-* Allow to select inches / oz as units of measurement (but please don't, we're living in the future and SI/metric is so much better! :) )
+  * Enable new devices
+  * Allow to use custom title (instead of random heck words)
+  * Allow to select inches / oz as units of measurement (but please don't, we're living in the future and SI/metric is so much better! :) )
 -Version 0.1.9
-* Added option to use inches & ounces (i.e. not metric units)
-* Allow using custom title, no title, or random title (default)
-* Added new Garmin devices
+  * Added option to use inches & ounces (i.e. not metric units)
+  * Allow using custom title, no title, or random title (default)
+  * Added new Garmin devices
 -Version 0.1.8
-* Interpolates data per second :)
+  * Interpolates data per second :)
 -Version 0.1.6
-* Added option to change accent color
-* Hopefully fixed bug where screen flashes blank
+  * Added option to change accent color
+  * Hopefully fixed bug where screen flashes blank
 -Version 0.1.3
-* Cleaned up settings strings to be cleaner.
+  * Cleaned up settings strings to be cleaner.
 -Version 0.1.0
   * First (public) version 
 
