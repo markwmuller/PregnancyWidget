@@ -4,9 +4,13 @@
     <property id="dueDateMonth" type="number">0</property>
     <property id="dueDateDay" type="number">0</property>
 
-    <property id="printHeckWord" type="boolean">True</property>
+    <property id="titleMode" type="number">1</property>
+    <property id="customTitle" type="string"></property>
+
     <property id="printTimeToGo" type="boolean">False</property>
 
     <property id="accentColor" type="number">1</property>
+
+    <property id="useSillyUnits" type="boolean">False</property>
 
 </properties>

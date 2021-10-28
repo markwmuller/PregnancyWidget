@@ -128,7 +128,7 @@ class PregnancyWidgetView extends WatchUi.View {
         return outStr;
     }
     
-    function getSizeString(secondsPregnant){
+    function getSizeString(secondsPregnant, useSillyUnits){
         //Size info:
         var wksPregnant = secondsPregnant / (7*24*60*60);
         var sizeStr;
@@ -141,19 +141,38 @@ class PregnancyWidgetView extends WatchUi.View {
             //interpolate wildly
             var l = sizeTable[wksPregnant][1] + (sizeTable[wksPregnant+1][1]-sizeTable[wksPregnant][1])*c;
             var m = sizeTable[wksPregnant][2] + (sizeTable[wksPregnant+1][2]-sizeTable[wksPregnant][2])*c;
-            l = Math.round(l);
-            m = Math.round(m);
+            if(!useSillyUnits){
+				l = Math.round(l);
+				m = Math.round(m);
 
-            sizeStr = "";
-            if(l < 1){
-                sizeStr += "<1mm\n" ;
-            } else {
-                sizeStr += l.format("%u")+"mm\n" ;
-            }
-            if(m < 1){
-                sizeStr += "<1g";
-            } else {
-                sizeStr += m.format("%u") + "g";
+				sizeStr = "";
+				if(l < 1){
+					sizeStr += "<1mm\n" ;
+				} else {
+					sizeStr += l.format("%u")+"mm\n" ;
+				}
+				if(m < 1){
+					sizeStr += "<1g";
+				} else {
+					sizeStr += m.format("%u") + "g";
+				}
+            }else{
+            	l = l / 25.4; //mm to inches
+            	m = m / 28.34952; //g to oz
+//				l = Math.round(l*100)/100;
+//				m = Math.round(m*100)/100;
+
+				sizeStr = "";
+				if(l < 1){
+					sizeStr += "<0.04in\n" ;
+				} else {
+					sizeStr += l.format("%.2f")+"in\n" ;
+				}
+				if(m < 1){
+					sizeStr += "<0.04oz";
+				} else {
+					sizeStr += m.format("%.2f") + "oz";
+				}
             }
         }
      	return sizeStr; 
@@ -180,10 +199,14 @@ class PregnancyWidgetView extends WatchUi.View {
     	var dueMonth = Application.Properties.getValue("dueDateMonth");
     	var dueDay = Application.Properties.getValue("dueDateDay");
 
-        var randomHeckWord = Application.Properties.getValue("printHeckWord"); 
+        var titleMode = Application.Properties.getValue("titleMode"); 
+        var customTitle = Application.Properties.getValue("customTitle"); 
+
         var printTimeToGo = Application.Properties.getValue("printTimeToGo"); //else, print time pregnant (since LMP)
         
         var accentColor = Application.Properties.getValue("accentColor"); 
+
+        var useSillyUnits = Application.Properties.getValue("useSillyUnits"); 
         
         if(dueYear == 0){
         	//settings aren't valid -- tell user to update
@@ -217,8 +240,14 @@ class PregnancyWidgetView extends WatchUi.View {
         var secondsPregnant = Time.now().value() - (estDueDate.value() - 40*7*24*60*60);
         
         var dataString = "";
-        if(randomHeckWord){
+        if(titleMode == 1){
+    		//random heck word
         	dataString += getHeckWord() + "\n";
+        }else if(titleMode == 2){
+        	//custom string
+        	dataString += customTitle + "\n";
+        }else{
+			//levae blank
         }
         dataString += "Due: " + dueDateStr;
         dataString += "\n";
@@ -230,7 +259,7 @@ class PregnancyWidgetView extends WatchUi.View {
             dataString += getTimePregnantString(estDueDate, secondsPregnant, daysToGo);
         }
 
-        dataString += getSizeString(secondsPregnant);
+        dataString += getSizeString(secondsPregnant, useSillyUnits);
 
         // clear the display
         dc.setColor( Graphics.COLOR_BLACK, Graphics.COLOR_BLACK );

@@ -6,7 +6,12 @@
 	<string id="dueDateDay">Estimated due date (day, e.g. '17')</string>
     
 
-    <string id="printHeckWord">Print a random heck word?</string>
+    <string id="titleMode">What to print for title:</string>
+	<string id ="RandomHeckWord">Random heck word</string>
+	<string id ="CustomTitle">Use a custom title</string>
+	<string id ="Nothing">Leave blank</string>
+    <string id="customTitle">Custom title to use</string>
+
     <string id="printTimeToGo">Print time to go, rather than time elapsed?</string>
 
     <string id="accentColor">Accent color</string>
@@ -17,5 +22,7 @@
     <string id="Pink">Pink</string>
     <string id="Orange">Orange</string>
     <string id="Purple">Purple</string>
+
+    <string id="useSillyUnits">Use inches / oz (not SI)</string>
 
 </strings>
